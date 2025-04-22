@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sketch Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Gothic&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: "Special Gothic", sans-serif;
+            background: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            margin-top: 30px;
+        }
+
+        #canvas-container {
+            display: inline-block;
+            max-width: 100%;
+            overflow: auto;
+            border: 1px solid #ccc;
+            background: #fff;
+        }
+
+        canvas {
+            width: 1000px;
+            height: 700px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .tools {
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            margin: 5px;
+            padding: 6px 10px;
+            font-size: 14px;
+            background: none;
+            border: none;
+            color: black;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.7;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            stroke: black;
+            fill: none;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        button.active-tool,
+        button.active-tool .icon {
+            color: #b40000;
+            stroke: #b40000;
+        }
+
+        #logo {
+            width: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <img id="logo"
+        src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMzUuNTQgMTc3Ljg5Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjMjMxZjIwOwogICAgICB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNTEuMjUgMTc3Ljg5IDUxLjI1IDEzNS4zOSA4NC4yOSAxMzUuMzkgODQuMjkgMTc3Ljg5IDEwMS4zNiAxNzcuODkgMTAxLjM2IDExOC4zMSAwIDExOC4zMSAwIDEzNS4zOSAzNC4xNyAxMzUuMzkgMzQuMTcgMTc3Ljg5IDUxLjI1IDE3Ny44OSIvPgogIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTEzNS41NCw2Ny43N0MxMzUuNTQsMzAuNCwxMDUuMTQsMCw2Ny43NywwUzAsMzAuNCwwLDY3Ljc3djMzLjQ0aDE3LjA2di0zMy40NGMwLTI3Ljk1LDIyLjc2LTUwLjcsNTAuNzEtNTAuN3M1MC42OSwyMi43NSw1MC42OSw1MC43djExMC4xMmgxNy4wOHYtMTEwLjEyWiIvPgogIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM0LjE3LDEwMS4yMXYtMzMuNDRjMC0xOC41MywxNS4wNy0zMy41OSwzMy42LTMzLjU5czMzLjU5LDE1LjA2LDMzLjU5LDMzLjU5djMzLjQ0SDM0LjE3Wk04NC4zMSw4NC4xNXYtMTYuMzhjMC05LjEyLTcuNDItMTYuNTQtMTYuNTQtMTYuNTRzLTE2LjU0LDcuNDItMTYuNTQsMTYuNTR2MTYuMzhoMzMuMDhaIi8+Cjwvc3ZnPg=="
+        alt="Logo">
+
+    <h1>ADF Design Group Sketch Tool</h1>
+
+    <div class="tools">
+        <button onclick="setMode('select')" data-mode="select">
+            <i data-lucide="mouse-pointer" class="icon"></i> Select
+        </button>
+        <button onclick="setMode('text')" data-mode="text">
+            <i data-lucide="type" class="icon"></i> Text
+        </button>
+        <button onclick="setMode('textbox')" data-mode="textbox">
+            <i data-lucide="square" class="icon"></i> Text Box
+        </button>
+        <button onclick="setMode('freehand')" data-mode="freehand">
+            <i data-lucide="pen-line" class="icon"></i> Freehand
+        </button>
+        <button onclick="setMode('line')" data-mode="line">
+            <i data-lucide="slash" class="icon"></i> Draw Line
+        </button>
+        <button onclick="setMode('circle')" data-mode="circle">
+            <i data-lucide="circle" class="icon"></i> Circle
+        </button>
+        <button onclick="setMode('square')" data-mode="square">
+            <i data-lucide="square" class="icon"></i> Square
+        </button>
+        <button onclick="undo()">
+            <i data-lucide="rotate-ccw" class="icon"></i> Undo
+        </button>
+        <button onclick="download()">
+            <i data-lucide="download" class="icon"></i> Save
+        </button>
+        <button onclick="clearCanvas()">
+            <i data-lucide="trash-2" class="icon"></i> Clear
+        </button>
+
+    </div>
+
+    <div style="margin-bottom: 30px;">
+        <button onclick="setColour('#b40000')"
+            style="background:#b40000; border-radius:50%; width:30px; height:30px; border:none;"></button>
+        <button onclick="setColour('#000000')"
+            style="background:#000000; border-radius:50%; width:30px; height:30px; border:none;"></button>
+        <button onclick="setColour('#ffffff')"
+            style="background:#ffffff; border-radius:50%; width:30px; height:30px; border:none;"></button>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="c" width="1000" height="700"></canvas>
+    </div>
+
+    <div>
+        <h4>© 2025 ADF Design Group. All rights reserved.</h4>
+    </div>
+    
+    <script>
+        const canvas = new fabric.Canvas('c', { selection: false, isDrawingMode: false });
+        canvas.perPixelTargetFind = true;
+        canvas.targetFindTolerance = 4;
+
+        let currentMode = '', startX, startY;
+        let line = null;
+        const history = [];
+        let currentColour = '#b40000';
+
+        function setColour(colour) {
+            currentColour = colour;
+            if (canvas.isDrawingMode) {
+                canvas.freeDrawingBrush.color = colour;
+            }
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            canvas.isDrawingMode = (mode === 'freehand');
+
+            canvas.selection = false;
+            canvas.discardActiveObject();
+            canvas.forEachObject(obj => obj.selectable = false);
+
+
+            // Always clear existing event listeners
+            canvas.off('mouse:down');
+            canvas.off('mouse:move');
+            canvas.off('mouse:up');
+
+            if (mode === 'select') {
+                canvas.selection = true;
+                canvas.forEachObject(obj => obj.selectable = true);
+            }
+
+
+            if (mode === 'circle' || mode === 'square') {
+                let shape = null;
+
+                canvas.on('mouse:down', function (opt) {
+                    const pointer = canvas.getPointer(opt.e);
+                    startX = pointer.x;
+                    startY = pointer.y;
+
+                    if (mode === 'circle') {
+                        shape = new fabric.Ellipse({
+                            left: startX,
+                            top: startY,
+                            rx: 1,
+                            ry: 1,
+                            stroke: currentColour,
+                            strokeWidth: 5,
+                            fill: 'transparent', // temporary fill for transparency
+                            originX: 'left',
+                            originY: 'top',
+                            selectable: false
+                        });
+                        shape.set({ fill: null }); // fix black fill
+
+                    } else {
+                        shape = new fabric.Rect({
+                            left: startX,
+                            top: startY,
+                            width: 1,
+                            height: 1,
+                            stroke: currentColour,
+                            strokeWidth: 5,
+                            fill: 'transparent', // temporary fill for transparency
+                            selectable: false
+                        });
+                        shape.set({ fill: null }); // fix black fill
+
+                    }
+
+                    canvas.add(shape);
+                });
+
+                canvas.on('mouse:move', function (opt) {
+                    if (!shape) return;
+                    const pointer = canvas.getPointer(opt.e);
+                    let w = pointer.x - startX;
+                    let h = pointer.y - startY;
+
+                    const shiftPressed = opt.e.shiftKey;
+                    if (shiftPressed) {
+                        const size = Math.min(Math.abs(w), Math.abs(h));
+                        w = w < 0 ? -size : size;
+                        h = h < 0 ? -size : size;
+                    }
+
+                    if (mode === 'circle') {
+                        shape.set({
+                            rx: Math.abs(w) / 2,
+                            ry: Math.abs(h) / 2,
+                            left: w < 0 ? startX + w : startX,
+                            top: h < 0 ? startY + h : startY
+                        });
+                    } else {
+                        shape.set({
+                            width: Math.abs(w),
+                            height: Math.abs(h),
+                            left: w < 0 ? startX + w : startX,
+                            top: h < 0 ? startY + h : startY
+                        });
+                    }
+
+                    canvas.renderAll();
+                });
+
+                canvas.on('mouse:up', function () {
+                    if (shape) {
+                        shape.set({ selectable: true });
+                        history.push(shape);
+                        shape = null;
+                    }
+                });
+            }
+
+
+            document.querySelectorAll('.tools button').forEach(btn => btn.classList.remove('active-tool'));
+            const activeBtn = document.querySelector(`button[data-mode="${mode}"]`);
+            if (activeBtn) activeBtn.classList.add('active-tool');
+
+            if (mode === 'freehand') {
+                canvas.freeDrawingBrush.width = 5;
+                canvas.freeDrawingBrush.color = currentColour;
+                canvas.on('path:created', e => {
+                    e.path.set({ fill: 'transparent', stroke: currentColour });
+                    history.push(e.path);
+                });
+            }
+            if (mode === 'text') {
+                const text = new fabric.IText('Edit me', { left: 100, top: 100, fontSize: 20, fill: currentColour });
+                canvas.add(text); history.push(text);
+            }
+            if (mode === 'textbox') {
+                const textbox = new fabric.Textbox('Type your paragraph here...', {
+                    left: 100, top: 150, width: 300, fontSize: 16, fill: currentColour, backgroundColor: 'white'
+                });
+                canvas.add(textbox); history.push(textbox);
+            }
+            if (mode === 'line') {
+                canvas.on('mouse:down', function (opt) {
+                    const pointer = canvas.getPointer(opt.e);
+                    startX = pointer.x;
+                    startY = pointer.y;
+                    line = new fabric.Line([startX, startY, startX, startY], {
+                        stroke: currentColour, strokeWidth: 5, selectable: false
+                    });
+                    canvas.add(line);
+                });
+
+                canvas.on('mouse:move', function (opt) {
+                    if (!line) return;
+                    const pointer = canvas.getPointer(opt.e);
+                    line.set({ x2: pointer.x, y2: pointer.y });
+                    canvas.renderAll();
+                });
+
+                canvas.on('mouse:up', function () {
+                    if (line) {
+                        line.set({ selectable: true });
+                        history.push(line);
+                        line = null;
+                    }
+                });
+            }
+        }
+
+        function undo() {
+            const item = history.pop();
+            if (item) {
+                canvas.remove(item);
+            }
+        }
+
+        function clearCanvas() {
+            canvas.getObjects().forEach(obj => canvas.remove(obj));
+            history.length = 0;
+        }
+
+        function download() {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const ctx = tempCanvas.getContext('2d');
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+            ctx.drawImage(canvas.lowerCanvasEl, 0, 0);
+
+            const link = document.createElement('a');
+            link.download = 'sketch.png';
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        lucide.createIcons();
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                const active = canvas.getActiveObjects();
+                if (active.length) {
+                    active.forEach(obj => canvas.remove(obj));
+                    canvas.discardActiveObject();
+                    canvas.requestRenderAll();
+                }
+            }
+        });
+
+
+
+    </script>
+</body>
+
+</html>
